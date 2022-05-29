@@ -1,5 +1,5 @@
 import * as chai from 'chai';
-import * as chaiAsPromised from 'chai-as-promised';
+import chaiAsPromised = require('chai-as-promised');
 import { spy, restore, stub } from 'simple-mock';
 import { isAsyncIterable } from 'iterall';
 import { RedisPubSub } from '../redis-pubsub';

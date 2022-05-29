@@ -1,4 +1,5 @@
 import { $$asyncIterator } from 'iterall';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { PubSubEngine } from 'graphql-subscriptions';
 
 /**
@@ -31,14 +32,18 @@ import { PubSubEngine } from 'graphql-subscriptions';
  * The PubSubEngine whose events will be observed.
  */
 export class PubSubAsyncIterator<T> implements AsyncIterator<T> {
-
-  constructor(pubsub: PubSubEngine, eventNames: string | string[], options?: unknown) {
+  constructor(
+    pubsub: PubSubEngine,
+    eventNames: string | string[],
+    options?: unknown,
+  ) {
     this.pubsub = pubsub;
     this.options = options;
     this.pullQueue = [];
     this.pushQueue = [];
     this.listening = true;
-    this.eventsArray = typeof eventNames === 'string' ? [eventNames] : eventNames;
+    this.eventsArray =
+      typeof eventNames === 'string' ? [eventNames] : eventNames;
   }
 
   public async next() {
@@ -46,7 +51,7 @@ export class PubSubAsyncIterator<T> implements AsyncIterator<T> {
     return this.listening ? this.pullValue() : this.return();
   }
 
-  public async return(): Promise<{ value: unknown, done: true }> {
+  public async return(): Promise<{ value: unknown; done: true }> {
     await this.emptyQueue();
     return { value: undefined, done: true };
   }
@@ -60,7 +65,7 @@ export class PubSubAsyncIterator<T> implements AsyncIterator<T> {
     return this;
   }
 
-  private pullQueue: Array<(data: { value: unknown, done: boolean }) => void>;
+  private pullQueue: Array<(data: { value: unknown; done: boolean }) => void>;
   private pushQueue: any[];
   private eventsArray: string[];
   private subscriptionIds: Promise<number[]> | undefined;
@@ -78,7 +83,7 @@ export class PubSubAsyncIterator<T> implements AsyncIterator<T> {
   }
 
   private pullValue(): Promise<IteratorResult<any>> {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       if (this.pushQueue.length !== 0) {
         resolve({ value: this.pushQueue.shift(), done: false });
       } else {
@@ -91,7 +96,9 @@ export class PubSubAsyncIterator<T> implements AsyncIterator<T> {
     if (this.listening) {
       this.listening = false;
       if (this.subscriptionIds) this.unsubscribeAll(await this.subscriptionIds);
-      this.pullQueue.forEach(resolve => resolve({ value: undefined, done: true }));
+      this.pullQueue.forEach((resolve) =>
+        resolve({ value: undefined, done: true }),
+      );
       this.pullQueue.length = 0;
       this.pushQueue.length = 0;
     }
@@ -99,9 +106,15 @@ export class PubSubAsyncIterator<T> implements AsyncIterator<T> {
 
   private subscribeAll() {
     if (!this.subscriptionIds) {
-      this.subscriptionIds = Promise.all(this.eventsArray.map(
-        eventName => this.pubsub.subscribe(eventName, this.pushValue.bind(this), this.options),
-      ));
+      this.subscriptionIds = Promise.all(
+        this.eventsArray.map((eventName) =>
+          this.pubsub.subscribe(
+            eventName,
+            this.pushValue.bind(this),
+            this.options,
+          ),
+        ),
+      );
     }
     return this.subscriptionIds;
   }
@@ -111,5 +124,4 @@ export class PubSubAsyncIterator<T> implements AsyncIterator<T> {
       this.pubsub.unsubscribe(subscriptionId);
     }
   }
-
 }
