@@ -1,5 +1,5 @@
 import * as chai from 'chai';
-import * as chaiAsPromised from 'chai-as-promised';
+import chaiAsPromised = require('chai-as-promised');
 import { mock } from 'simple-mock';
 import { parse, GraphQLSchema, GraphQLObjectType, GraphQLString, GraphQLFieldResolver } from 'graphql';
 import { isAsyncIterable } from 'iterall';

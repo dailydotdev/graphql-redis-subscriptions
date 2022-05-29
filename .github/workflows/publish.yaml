@@ -1,0 +1,36 @@
+name: Publish Package
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish:
+    name: Publish to NPM
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout source files
+      - name: Checkout action
+        uses: actions/checkout@v2
+
+      # Setup Node and NPM
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+          registry-url: 'https://registry.npmjs.org'
+          always-auth: true
+
+      - name: Setup Environment
+        run: |
+          npm set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build
+        run: rm -rf dist && tsc -p tsconfig.json && ncc build --quiet --minify
+
+      - name: Publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public . || echo 'Version already exists'
